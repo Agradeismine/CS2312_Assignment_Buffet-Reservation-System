@@ -41,7 +41,7 @@ public class Main {
 			if (cmdParts[0].equals("startNewDay"))
 				(new CmdStartNewDay()).execute(cmdParts);
 			if (cmdParts[0].equals("cancel"))
-				(new CmdStartNewDay()).execute(cmdParts);
+				(new CmdCancel()).execute(cmdParts);
 			if (cmdParts[0].equals("undo"))
 				RecordedCommand.undoOneCommand();
 			if (cmdParts[0].equals("redo"))

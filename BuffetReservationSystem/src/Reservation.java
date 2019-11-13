@@ -1,11 +1,13 @@
-public class Reservation implements Comparable <Reservation>{
+import java.util.ArrayList;
+
+public class Reservation implements Cloneable, Comparable <Reservation>{
 	private String guestName;
 	private String phoneNumber;
 	private int totPersons;
 	private Day dateDine;
 	private Day dateRequest;
 	private int ticketCode;
-	private int [] tableStatus;
+	private ArrayList<String>tableStatus;
 
 	public Reservation(String guestName, String phoneNumber, int totPersons, String sDateDine, int ticketCode)
 	{	
@@ -15,6 +17,7 @@ public class Reservation implements Comparable <Reservation>{
 		dateDine = new Day(sDateDine);
 		dateRequest = SystemDate.getInstance().clone();
 		this.ticketCode = ticketCode;
+		tableStatus = new ArrayList<>();
 	}
 	
 	public Day getDateDine() {
@@ -25,10 +28,13 @@ public class Reservation implements Comparable <Reservation>{
 		return ticketCode;
 	}
 
+	public void assignTable(String table) {
+		tableStatus.add(table);
+	}
+	
 	@Override
 	public String toString() 
 	{
-		
 		return String.format("%-13s%-11s%-14s%-24s%5d%14s", guestName, phoneNumber, dateRequest, dateDine + " (Ticket "+ticketCode+")", totPersons, getTableStatus());
 	}
 
@@ -38,8 +44,12 @@ public class Reservation implements Comparable <Reservation>{
 	}
 	
 	public String getTableStatus() {
-		if(tableStatus!=null) {
-			return	"....";
+		if(tableStatus.size()>0) {
+			String str="Table assigned: ";
+			for(String temp: tableStatus ) {
+				str+=temp+" ";
+			}
+			return	str;
 		}else
 			return "Pending";
 	}
@@ -51,5 +61,11 @@ public class Reservation implements Comparable <Reservation>{
 		}else {
 			return this.guestName.compareTo(another.guestName);
 		}
+	}
+	
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+
+	    return super.clone();
 	}
 }
