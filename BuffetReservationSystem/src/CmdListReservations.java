@@ -1,4 +1,3 @@
-
 public class CmdListReservations implements Command{
 
 	@Override

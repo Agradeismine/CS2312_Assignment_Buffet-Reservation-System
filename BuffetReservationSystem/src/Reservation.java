@@ -32,15 +32,19 @@ public class Reservation implements Cloneable, Comparable <Reservation>{
 		tableStatus.add(table);
 	}
 	
+	public void removeAssignedTable(String table) {
+		tableStatus.remove(table);
+	}
+	
 	@Override
 	public String toString() 
 	{
-		return String.format("%-13s%-11s%-14s%-24s%5d%14s", guestName, phoneNumber, dateRequest, dateDine + " (Ticket "+ticketCode+")", totPersons, getTableStatus());
+		return String.format("%-13s%-11s%-14s%-24s%5d\t\t%s", guestName, phoneNumber, dateRequest, dateDine + " (Ticket "+ticketCode+")", totPersons, getTableStatus());
 	}
 
 	public static String getListingHeader() 
 	{
-		return String.format("%-13s%-11s%-14s%-25s%-11s%s", "Guest Name", "Phone", "Request Date", "Dining Date and Ticket", "#Persons", "Status");
+		return String.format("%-13s%-11s%-14s%-25s%-11s\t%s", "Guest Name", "Phone", "Request Date", "Dining Date and Ticket", "#Persons", "Status");
 	}
 	
 	public String getTableStatus() {
@@ -52,6 +56,10 @@ public class Reservation implements Cloneable, Comparable <Reservation>{
 			return	str;
 		}else
 			return "Pending";
+	}
+	
+	public ArrayList<String> getTableStatusArrayList() {
+		return tableStatus;
 	}
 
 	@Override
@@ -67,5 +75,9 @@ public class Reservation implements Cloneable, Comparable <Reservation>{
 	protected Object clone() throws CloneNotSupportedException {
 
 	    return super.clone();
+	}
+
+	public int getTotalPersons() {
+		return totPersons;
 	}
 }

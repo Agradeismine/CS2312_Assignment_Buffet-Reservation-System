@@ -38,8 +38,14 @@ public class Main {
 				(new CmdRequest()).execute(cmdParts);
 			if (cmdParts[0].equals("listReservations"))
 				(new CmdListReservations()).execute(cmdParts);
+			if (cmdParts[0].equals("listTableAllocations"))
+				(new CmdListTableAllocations()).execute(cmdParts);
 			if (cmdParts[0].equals("startNewDay"))
 				(new CmdStartNewDay()).execute(cmdParts);
+			if (cmdParts[0].equals("assignTable"))
+				(new CmdAssignTable()).execute(cmdParts);
+			if (cmdParts[0].equals("suggestTable"))
+				(new CmdSuggestTable()).execute(cmdParts);
 			if (cmdParts[0].equals("cancel"))
 				(new CmdCancel()).execute(cmdParts);
 			if (cmdParts[0].equals("undo"))
