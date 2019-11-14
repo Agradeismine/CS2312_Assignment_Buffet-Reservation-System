@@ -20,6 +20,14 @@ public class Reservation implements Cloneable, Comparable <Reservation>{
 		tableStatus = new ArrayList<>();
 	}
 	
+	public String getGuestName() {
+		return guestName;
+	}
+	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+	
 	public Day getDateDine() {
 		return dateDine;
 	}
@@ -65,7 +73,17 @@ public class Reservation implements Cloneable, Comparable <Reservation>{
 	@Override
 	public int compareTo(Reservation another) {
 		if (this.guestName.compareTo(another.guestName)==0){
-			return this.dateDine.toString().compareTo(another.dateDine.toString());
+			if(this.phoneNumber.compareTo(another.getPhoneNumber())==0)
+				if(this.dateDine.getYear()==(another.dateDine.getYear())) {
+					if(this.dateDine.getMonth()==(another.dateDine.getMonth()))
+						return String.valueOf(this.dateDine.getDay()).compareTo(String.valueOf(another.dateDine.getDay()));
+					else {
+						return String.valueOf(this.dateDine.getMonth()).compareTo(String.valueOf(another.dateDine.getMonth()));
+					}
+				}else 
+					return String.valueOf(this.dateDine.getYear()).compareTo(String.valueOf(another.dateDine.getYear()));
+			else
+				return this.phoneNumber.compareTo(another.getPhoneNumber());
 		}else {
 			return this.guestName.compareTo(another.guestName);
 		}

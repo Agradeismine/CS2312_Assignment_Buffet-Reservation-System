@@ -7,7 +7,6 @@ public class BookingOffice {
 	private ArrayList<Reservation> allReservations;
 	private HashMap<String, Integer> dayTicketCode;
 	private HashMap<String, TableStatus> dateTableStatus;
-	
 
 	private static BookingOffice instance = new BookingOffice();
 
@@ -17,68 +16,98 @@ public class BookingOffice {
 		dateTableStatus = new HashMap<String, TableStatus>();
 	}
 
-	public static BookingOffice getInstance(){ return instance; }
+	public static BookingOffice getInstance() {
+		return instance;
+	}
 
-	public HashMap<String, Integer> getDayTicketCode(){ return dayTicketCode; }
-	public HashMap<String, TableStatus> getDateTableStatus(){ return dateTableStatus; }
-	
-	public Reservation assignTable (String [] cmdParts) {	//assignTable|22-Mar-2019|2|T01|T02
-		Reservation r=getReservation(cmdParts[1], Integer.parseInt(cmdParts[2]));
-		if(!dateTableStatus.containsKey(cmdParts[1])) {
+	public HashMap<String, Integer> getDayTicketCode() {
+		return dayTicketCode;
+	}
+
+	public HashMap<String, TableStatus> getDateTableStatus() {
+		return dateTableStatus;
+	}
+
+	public Reservation assignTable(String[] cmdParts) { // assignTable|22-Mar-2019|2|T01|T02
+		Reservation r = getReservation(cmdParts[1], Integer.parseInt(cmdParts[2]));
+		try {
+		if(r==null) {
+			throw new BookingNotFoundException();
+		}
+		if (!dateTableStatus.containsKey(cmdParts[1])) {
 			dateTableStatus.put(cmdParts[1], new TableStatus());
 		}
 		TableStatus tableStatus = dateTableStatus.get(cmdParts[1]);
-		for	(int i=3; i< cmdParts.length; i++) {
-			if(tableStatus.addAllocatedTables(cmdParts[i])) {	//save the status in Reservation if assign table successfully
-				r.assignTable(cmdParts[i]);
+			for (int i = 3; i < cmdParts.length; i++) {
+				if (tableStatus.addAllocatedTables(cmdParts[i])) { // save the status in Reservation if assign table successfully
+					r.assignTable(cmdParts[i]);
+				}
 			}
+			dateTableStatus.replace(cmdParts[1], tableStatus);
+		}catch(BookingNotFoundException e) {
 		}
-		dateTableStatus.replace(cmdParts[1], tableStatus);
 		return r;
 	}
-	
-	public void removeAssignTable(String[] cmdParts) {	//cmdParts: assignTable|22-Mar-2019|2|T01|T02
-		Reservation r=getReservation(cmdParts[1], Integer.parseInt(cmdParts[2]));
+
+	public void removeAssignTable(String[] cmdParts) { // cmdParts: assignTable|22-Mar-2019|2|T01|T02
+		Reservation r = getReservation(cmdParts[1], Integer.parseInt(cmdParts[2]));
 		TableStatus tableStatus = dateTableStatus.get(cmdParts[1]);
-		for	(int i=3; i< cmdParts.length; i++) {
-			if(tableStatus.removeAllocatedTables(cmdParts[i])) {	//save the status in Reservation if assign table successfully
+		for (int i = 3; i < cmdParts.length; i++) {
+			if (tableStatus.removeAllocatedTables(cmdParts[i])) { // save the status in Reservation if assign table
+																	// successfully
 				r.removeAssignedTable(cmdParts[i]);
 			}
 		}
 		dateTableStatus.replace(cmdParts[1], tableStatus);
 	}
 
-	public Reservation addReservation(String name, String num, int totalPersons, String sDate)  //bo.addReservation("LEE, Mr","90888000", 10, "18-Mar-2019"); 
+	public Reservation addReservation(String name, String num, int totalPersons, String sDate) // bo.addReservation("LEE,
+																								// Mr","90888000", 10,
+																								// "18-Mar-2019");
 	{
-		if(!dayTicketCode.containsKey(sDate)) {
-			dayTicketCode.put(sDate, 0);
+		Reservation r = null;
+		if (!hasSamePersonForDinDate(name, num, sDate)) {
+			if (!dayTicketCode.containsKey(sDate)) {
+				dayTicketCode.put(sDate, 0);
+			}
+
+			dayTicketCode.replace(sDate, dayTicketCode.get(sDate) + 1);
+			r = new Reservation(name, num, totalPersons, sDate, (int) dayTicketCode.get(sDate));
+			allReservations.add(r);
+			Collections.sort(allReservations);
 		}
-		
-		dayTicketCode.replace(sDate, dayTicketCode.get(sDate)+1);
-		Reservation r = new Reservation(name, num, totalPersons, sDate, (int)dayTicketCode.get(sDate));
-		allReservations.add(r);
-		Collections.sort(allReservations);
-		return r; //Why return?  Ans: You'll see that it is useful in CmdRequest.java in Q2. 
+		return r; // Why return? Ans: You'll see that it is useful in CmdRequest.java in Q2.
 	}
-	
-	public void addReservation(Reservation r)  //bo.addReservation(r); 
-	{		
-		allReservations.add(r);
-		Collections.sort(allReservations);
+
+	private boolean hasSamePersonForDinDate(String name, String num, String sDate) {
+		for (Reservation r : allReservations) {
+			if (r.getGuestName().equals(name) && r.getPhoneNumber().equals(num)
+					&& r.getDateDine().toString().equals(sDate)) {
+				return true;
+			}
+		}
+		return false;
 	}
-	
-	public boolean removeReservation(Reservation r)  //bo.addReservation("LEE, Mr","90888000", 10, "18-Mar-2019"); 
+
+	public void addReservation(Reservation r) // bo.addReservation(r);
 	{
+		allReservations.add(r);
+		Collections.sort(allReservations);
+	}
+
+	public boolean removeReservation(Reservation r) // bo.addReservation("LEE, Mr","90888000", 10, "18-Mar-2019");
+	{
+		dayTicketCode.replace(r.getDateDine().toString(), dayTicketCode.get(r.getDateDine().toString()) - 1);
 		boolean removed = allReservations.remove(r);
 		Collections.sort(allReservations);
 		return removed;
 	}
-	
-	public Reservation getReservation(String dinDate, int ticketCode)  //bo.getReservation("22-Mar-2019", 3); 
+
+	public Reservation getReservation(String dinDate, int ticketCode) // bo.getReservation("22-Mar-2019", 3);
 	{
 		Reservation r = null;
-		for(Reservation e : allReservations) {
-			if(e.getDateDine().toString().equals(dinDate) && e.getTicketCode()==ticketCode) {
+		for (Reservation e : allReservations) {
+			if (e.getDateDine().toString().equals(dinDate) && e.getTicketCode() == ticketCode) {
 				r = e;
 			}
 		}
@@ -91,7 +120,6 @@ public class BookingOffice {
 		for (Reservation r : allReservations)
 			System.out.println(r); // r or r.toString()
 	}
-	
 
 	public void listTableAllocations(String dinDate) {
 		// list Allocated tables
@@ -139,57 +167,55 @@ public class BookingOffice {
 		}
 		System.out.println(countPending + " (Total number of persons = " + totalPendingPersons + ")");
 	}
-	
+
 	public void suggestTable(String dinDate, int ticketCode) {
 		Reservation r = getReservation(dinDate, ticketCode);
 		TableStatus tablestatus = getDateTableStatus().get(dinDate);
 		ArrayList<String> availableTables;
-		if(tablestatus!=null) {
+		if (tablestatus != null) {
 			availableTables = (ArrayList<String>) tablestatus.getAvailableTables().clone();
-		}else {
+		} else {
 			availableTables = (ArrayList<String>) TableStatus.getAllTables().clone();
 		}
 		int totalPersons = r.getTotalPersons();
-		String suggestTables="";
-		System.out.println("availableTables size: "+availableTables.size());	//test
-		System.out.print("Suggestion for "+totalPersons+" persons: ");
-		while(totalPersons>=10) {
-			for(int i = 0; i < availableTables.size(); i++) {
+		String suggestTables = "";
+		System.out.println("availableTables size: " + availableTables.size()); // test
+		System.out.print("Suggestion for " + totalPersons + " persons: ");
+		while (totalPersons >= 10) {
+			for (int i = 0; i < availableTables.size(); i++) {
 				String s = availableTables.get(i);
-				if(availableTables.get(i).charAt(0)=='H') {	//check has eight people table
-					suggestTables+= availableTables.remove(i)+" ";
-					totalPersons-=8;
-					//System.out.println("remaining person: "+totalPersons);
+				if (availableTables.get(i).charAt(0) == 'H') { // check has eight people table
+					suggestTables += availableTables.remove(i) + " ";
+					totalPersons -= 8;
+					// System.out.println("remaining person: "+totalPersons);
 					break;
 				}
 			}
 		}
-		
-		while(totalPersons>=4) {
-			for(int i = 0; i < availableTables.size(); i++) {
-				if(availableTables.get(i).charAt(0)=='F') {	//check has eight people table
-					suggestTables+= availableTables.remove(i)+" ";
-					totalPersons-=4;
-					//System.out.println("remaining person: "+totalPersons);
+
+		while (totalPersons >= 4) {
+			for (int i = 0; i < availableTables.size(); i++) {
+				if (availableTables.get(i).charAt(0) == 'F') { // check has eight people table
+					suggestTables += availableTables.remove(i) + " ";
+					totalPersons -= 4;
+					// System.out.println("remaining person: "+totalPersons);
 					break;
 				}
 			}
 		}
-		
-		while(totalPersons>0) {
-			for(int i = 0; i < availableTables.size(); i++) {
-				if(availableTables.get(i).charAt(0)=='T') {	//check has eight people table
-					suggestTables+= availableTables.remove(i)+" ";
-					totalPersons-=2;
-					//System.out.println("remaining person: "+totalPersons);
+
+		while (totalPersons > 0) {
+			for (int i = 0; i < availableTables.size(); i++) {
+				if (availableTables.get(i).charAt(0) == 'T') { // check has eight people table
+					suggestTables += availableTables.remove(i) + " ";
+					totalPersons -= 2;
+					// System.out.println("remaining person: "+totalPersons);
 					break;
 				}
 			}
 		}
-		
+
 		System.out.println(suggestTables);
 	}
-
-
 
 }

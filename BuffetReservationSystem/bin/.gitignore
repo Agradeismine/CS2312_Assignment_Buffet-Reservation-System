@@ -1,3 +1,7 @@
 /TableStatus.class
 /CmdListTableAllocations.class
 /CmdSuggestTable.class
+/SameBookingOnDateException.class
+/DateIncorrectException.class
+/InsufficientCommandException.class
+/BookingNotFoundException.class

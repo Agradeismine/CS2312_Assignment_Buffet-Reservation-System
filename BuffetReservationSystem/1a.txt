@@ -1,3 +1,0 @@
-startNewDay|17-Mar-2019
-request|CHAN, Ms|90123456|4|22-Mar-2019
-listReservations

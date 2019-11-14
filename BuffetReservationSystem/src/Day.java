@@ -19,6 +19,17 @@ public class Day implements Cloneable{
 		set(sDay);
 	}
 	
+	public int getYear() {
+		return year;
+	}
+	
+	public int getMonth() {
+		return month;
+	}
+	
+	public int getDay() {
+		return day;
+	}
 	
 	@Override
 	public Day clone() {
@@ -53,8 +64,19 @@ public class Day implements Cloneable{
 	}
 	
 	// check if y,m,d valid
-	static public boolean valid(int y, int m, int d)
+	public static boolean valid(int y, String month, int d)
 	{
+		int m=0;;
+		final String[] Month = {
+		"Jan", "Feb", "Mar", "Apr",
+		"May", "Jun", "Jul", "Aug",
+		"Sep", "Oct", "Nov", "Dec"};
+		for(int i=0; i <Month.length; i++) {
+			if(month.equals(Month[i])) {
+				m=i+1;
+				break;
+			}
+		}
 		if (m<1 || m>12 || d<1) return false;
 		switch(m){
 			case 1: case 3: case 5: case 7:
@@ -73,13 +95,39 @@ public class Day implements Cloneable{
 
 	@Override
 	public String toString() {
-		
-		//final String[] MonthNames = {
+		//final String[] Month = {
 //				"Jan", "Feb", "Mar", "Apr",
 //				"May", "Jun", "Jul", "Aug",
 //				"Sep", "Oct", "Nov", "Dec"};
 		
-		//return day+" "+ MonthNames[month-1] + " "+ year;
+		//return day+" "+ Month[month-1] + " "+ year;
 		return day+"-"+ MonthNames.substring((month-1)*3, (month)*3) + "-"+ year;
+	}
+	
+	public int monthStringToInt(String month) {
+		int m=0;;
+		final String[] Month = {
+		"Jan", "Feb", "Mar", "Apr",
+		"May", "Jun", "Jul", "Aug",
+		"Sep", "Oct", "Nov", "Dec"};
+		for(int i=0; i <Month.length; i++) {
+			if(month.equals(Month[i])) {
+				m=i+1;
+				break;
+			}
+		}
+		return m;
+		
+	}
+
+	public boolean isPreviousDate(int y, String month, int d) {
+		
+		int m=monthStringToInt(month);
+		
+		if(year>y || this.month > m && year>=y || day> d && this.month >= m && year>=y) {
+			return true;
+		}
+		
+		return false;
 	}
 }
