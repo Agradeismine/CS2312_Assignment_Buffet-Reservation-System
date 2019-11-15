@@ -97,7 +97,7 @@ public class BookingOffice {
 
 	public boolean removeReservation(Reservation r) // bo.addReservation("LEE, Mr","90888000", 10, "18-Mar-2019");
 	{
-		dayTicketCode.replace(r.getDateDine().toString(), dayTicketCode.get(r.getDateDine().toString()) - 1);
+		//dayTicketCode.replace(r.getDateDine().toString(), dayTicketCode.get(r.getDateDine().toString()) - 1);
 		boolean removed = allReservations.remove(r);
 		Collections.sort(allReservations);
 		return removed;
