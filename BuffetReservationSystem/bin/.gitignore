@@ -5,3 +5,7 @@
 /DateIncorrectException.class
 /InsufficientCommandException.class
 /BookingNotFoundException.class
+/AllocatedTableSorter.class
+/TableSorter.class
+/TableCodeNotFoundException.class
+/TableReservedException.class

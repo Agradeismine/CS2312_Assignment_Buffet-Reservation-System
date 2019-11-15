@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections; //Provides sorting
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class BookingOffice {
@@ -34,9 +36,22 @@ public class BookingOffice {
 		if(r==null) {
 			throw new BookingNotFoundException();
 		}
+		
 		if (!dateTableStatus.containsKey(cmdParts[1])) {
 			dateTableStatus.put(cmdParts[1], new TableStatus());
 		}
+		
+		//check all tables is it available
+		//boolean allTableAvailable = true;
+		ArrayList <String> availableTable = dateTableStatus.get(cmdParts[1]).getAvailableTables();
+		for (int i =3; i<cmdParts.length; i++ ) {
+			if(!availableTable.contains(cmdParts[i])) {	//set allTableAvailable to false if one of tables is allocated
+				//allTableAvailable=false;
+				throw new TableReservedException(cmdParts[i]);
+			}
+		}
+
+		//if(allTableAvailable==true){
 		TableStatus tableStatus = dateTableStatus.get(cmdParts[1]);
 			for (int i = 3; i < cmdParts.length; i++) {
 				if (tableStatus.addAllocatedTables(cmdParts[i])) { // save the status in Reservation if assign table successfully
@@ -44,7 +59,12 @@ public class BookingOffice {
 				}
 			}
 			dateTableStatus.replace(cmdParts[1], tableStatus);
+		//}else {	//some of tables reserved
+		//	throw new TableReservedException();
+		//}
+		
 		}catch(BookingNotFoundException e) {
+		} catch (TableReservedException e) {
 		}
 		return r;
 	}
@@ -58,6 +78,7 @@ public class BookingOffice {
 				r.removeAssignedTable(cmdParts[i]);
 			}
 		}
+		Collections.sort(tableStatus.getAvailableTables(), new TableSorter());
 		dateTableStatus.replace(cmdParts[1], tableStatus);
 	}
 
@@ -124,6 +145,9 @@ public class BookingOffice {
 	public void listTableAllocations(String dinDate) {
 		// list Allocated tables
 		boolean hasAllocatedTable = false;
+		ArrayList <String> tempAllocatedTblList = new ArrayList<>();
+
+		
 		System.out.println("Allocated tables: ");
 		for (Reservation r : allReservations) {
 			if (r.getDateDine().toString().equals(dinDate)) {
@@ -131,11 +155,17 @@ public class BookingOffice {
 				if (arrList.size() > 0) {
 					hasAllocatedTable = true;
 					for (int i = 0; i < arrList.size(); i++) {
-						System.out.println(arrList.get(i) + " (Ticket " + r.getTicketCode() + ")");
+						//System.out.println(arrList.get(i) + " (Ticket " + r.getTicketCode() + ")");
+						tempAllocatedTblList.add(arrList.get(i) + " (Ticket " + r.getTicketCode() + ")");
 					}
 				}
 			}
 		}
+		Collections.sort(tempAllocatedTblList, new TableSorter());
+		for(String s : tempAllocatedTblList) {
+			System.out.println(s);
+		}
+		
 		if (!hasAllocatedTable) { // no allocated table
 			System.out.println("[None]");
 		}
@@ -154,7 +184,7 @@ public class BookingOffice {
 		int countPending = 0, totalPendingPersons = 0;
 		System.out.println();
 		System.out.print("Total number of pending requests = ");
-		if (ts != null) {
+		//if (ts != null) {
 			for (Reservation r : allReservations) { // count all pending requests on dinDate
 				if (r.getDateDine().toString().equals(dinDate)) {
 					ArrayList<String> arrList = r.getTableStatusArrayList();
@@ -164,7 +194,7 @@ public class BookingOffice {
 					}
 				}
 			}
-		}
+		//}
 		System.out.println(countPending + " (Total number of persons = " + totalPendingPersons + ")");
 	}
 

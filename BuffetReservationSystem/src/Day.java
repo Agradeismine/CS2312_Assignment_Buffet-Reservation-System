@@ -120,14 +120,12 @@ public class Day implements Cloneable{
 		
 	}
 
-	public boolean isPreviousDate(int y, String month, int d) {
-		
-		int m=monthStringToInt(month);
+	public boolean isPreviousDate(int y, String mon, int d) {
+		int m=monthStringToInt(mon);
 		
 		if(year>y || this.month > m && year>=y || day> d && this.month >= m && year>=y) {
 			return true;
 		}
-		
 		return false;
 	}
 }
