@@ -19,11 +19,9 @@ public class CmdStartNewDay extends RecordedCommand {
 			throw new InsufficientCommandException();
 		}
 		}catch(InsufficientCommandException e) {
-			
+			System.out.println(e.getMessage());
 		}catch(ArrayIndexOutOfBoundsException e) {
 			System.out.println("Insufficient command arguments!");
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
 		}
 	}
 

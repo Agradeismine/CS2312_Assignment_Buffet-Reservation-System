@@ -59,14 +59,17 @@ public class CmdAssignTable extends RecordedCommand {
 		} catch (InsufficientCommandException e) {
 		} catch (DateIncorrectException e) {
 		} catch (TableCodeNotFoundException e) {
+		} catch (BookingNotFoundException e) {
 		}
 	}
 
 	@Override
 	public void undoMe() {
 		BookingOffice bo = BookingOffice.getInstance();
-		bo.removeAssignTable(cmdParts);
-		// System.out.println("undo: "+removed);
+		try {
+			bo.removeAssignTable(cmdParts);
+		} catch (BookingNotFoundException e) {
+		}
 		addRedoCommand(this); // <====== upon undo, we should keep a copy in the redo list (addRedoCommand is
 								// implemented in RecordedCommand.java)
 	}
@@ -74,8 +77,11 @@ public class CmdAssignTable extends RecordedCommand {
 	@Override
 	public void redoMe() {
 		BookingOffice bo = BookingOffice.getInstance();
+		try {
 		r = bo.getReservation(cmdParts[1], Integer.parseInt(cmdParts[2])); // clone for undo
 		r = bo.assignTable(cmdParts);
+		}catch (BookingNotFoundException e) {
+		}
 		addUndoCommand(this); // <====== upon redo, we should keep a copy in the undo list
 	}
 

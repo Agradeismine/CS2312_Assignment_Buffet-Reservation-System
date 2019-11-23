@@ -40,8 +40,8 @@ public class Reservation implements Cloneable, Comparable <Reservation>{
 		tableStatus.add(table);
 	}
 	
-	public void removeAssignedTable(String table) {
-		tableStatus.remove(table);
+	public boolean removeAssignedTable(String table) {
+		return tableStatus.remove(table);
 	}
 	
 	@Override
