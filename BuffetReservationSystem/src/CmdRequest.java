@@ -49,7 +49,7 @@ public class CmdRequest extends RecordedCommand {
 	@Override
 	public void redoMe() {
 		BookingOffice bo = BookingOffice.getInstance();
-		r = bo.addReservation(name, number, totalPersons, diningDate);
+		bo.addReservation(r);
 		addUndoCommand(this);
 	}
 

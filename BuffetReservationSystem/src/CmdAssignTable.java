@@ -57,6 +57,7 @@ public class CmdAssignTable extends RecordedCommand {
 			System.out.println("Booking not found!");
 			e.printStackTrace();
 		} catch (InsufficientCommandException e) {
+			System.out.println(e.getMessage());
 		} catch (DateIncorrectException e) {
 		} catch (TableCodeNotFoundException e) {
 		} catch (BookingNotFoundException e) {

@@ -71,11 +71,11 @@ public class BookingOffice {
 		}
 		return r;
 	}
-	
+
 	public void assignTableForReservation(Reservation r) {
 		String dinDate = r.getDateDine().toString();
 		TableStatus tableStatus = dateTableStatus.get(dinDate);
-		ArrayList <String> rTableStatus = r.getTableStatusArrayList();
+		ArrayList<String> rTableStatus = r.getTableStatusArrayList();
 		for (int i = 0; i < rTableStatus.size(); i++) {
 			tableStatus.addAllocatedTables(rTableStatus.get(i));
 		}
@@ -87,15 +87,16 @@ public class BookingOffice {
 		TableStatus tableStatus = dateTableStatus.get(dinDate);
 		ArrayList<String> rTableStatus = r.getTableStatusArrayList();
 		int size = rTableStatus.size();
-		for (int i = 0; i<size;i++) {
-			//r.removeAssignedTable(rTableStatus.get(i));
+		for (int i = 0; i < size; i++) {
+			// r.removeAssignedTable(rTableStatus.get(i));
 			tableStatus.removeAllocatedTables(rTableStatus.get(i));
 		}
 		Collections.sort(tableStatus.getAvailableTables(), new TableSorter());
 		dateTableStatus.replace(dinDate, tableStatus);
 	}
 
-	public void removeAssignTable(String[] cmdParts) throws BookingNotFoundException { // cmdParts: assignTable|24-Mar-2019|3|F01|F05|T02
+	public void removeAssignTable(String[] cmdParts) throws BookingNotFoundException { // cmdParts:
+																						// assignTable|24-Mar-2019|3|F01|F05|T02
 		Reservation r = getReservation(cmdParts[1], Integer.parseInt(cmdParts[2]));
 		TableStatus tableStatus = dateTableStatus.get(cmdParts[1]);
 		for (int i = 3; i < cmdParts.length; i++) {
@@ -106,7 +107,7 @@ public class BookingOffice {
 		}
 		Collections.sort(tableStatus.getAvailableTables(), new TableSorter());
 		dateTableStatus.replace(cmdParts[1], tableStatus);
-		
+
 //		//test After removeAssignTable
 //		ArrayList <String> arrlist =tableStatus.getAvailableTables();
 //		System.out.print("After removeAssignTable: ");
@@ -155,13 +156,16 @@ public class BookingOffice {
 	{
 		// dayTicketCode.replace(r.getDateDine().toString(),
 		// dayTicketCode.get(r.getDateDine().toString()) - 1);
-		removeAllAssignTableForReservation(r);
+		if (r.getTableStatusArrayList().size() > 0) {
+			removeAllAssignTableForReservation(r);
+		}
 		boolean removed = allReservations.remove(r);
 		Collections.sort(allReservations);
 		return removed;
 	}
 
-	public Reservation getReservation(String dinDate, int ticketCode) throws BookingNotFoundException // bo.getReservation("22-Mar-2019", 3);
+	public Reservation getReservation(String dinDate, int ticketCode) throws BookingNotFoundException // bo.getReservation("22-Mar-2019",
+																										// 3);
 	{
 		for (Reservation e : allReservations) {
 			if (e.getDateDine().toString().equals(dinDate) && e.getTicketCode() == ticketCode) {
@@ -169,7 +173,7 @@ public class BookingOffice {
 				return e;
 			}
 		}
-		
+
 		throw new BookingNotFoundException();
 	}
 
@@ -237,68 +241,68 @@ public class BookingOffice {
 	public void suggestTable(String dinDate, int ticketCode) throws BookingNotFoundException, TableAssignedException {
 		Reservation r;
 		r = getReservation(dinDate, ticketCode);
-		if(r.getTableStatusArrayList().size()==0) {
-		TableStatus tablestatus = getDateTableStatus().get(dinDate);
-		ArrayList<String> availableTables;
-		boolean notEnoughTables = false;
-		if (tablestatus != null) {
-			availableTables = (ArrayList<String>) tablestatus.getAvailableTables().clone();
-		} else {
-			availableTables = (ArrayList<String>) TableStatus.getAllTables().clone();
-		}
-		int totalPersons = r.getTotalPersons();
-		String suggestTables = "";
-		System.out.print("Suggestion for " + totalPersons + " persons: ");
-		while (totalPersons >= 7 && !notEnoughTables) {
-			for (int i = 0; i < availableTables.size(); i++) {
-				String s = availableTables.get(i);
-				if (availableTables.get(i).charAt(0) == 'H') { // check has eight people table
-					suggestTables += availableTables.remove(i) + " ";
-					totalPersons -= 8;
-					// System.out.println("remaining person: "+totalPersons);
-					break;
-				}else if (i == availableTables.size()-1) {
-					notEnoughTables = true;
-				}
+		if (r.getTableStatusArrayList().size() == 0) {
+			TableStatus tablestatus = getDateTableStatus().get(dinDate);
+			ArrayList<String> availableTables;
+			boolean notEnoughTables = false;
+			if (tablestatus != null) {
+				availableTables = (ArrayList<String>) tablestatus.getAvailableTables().clone();
+			} else {
+				availableTables = (ArrayList<String>) TableStatus.getAllTables().clone();
 			}
-		}
-		
-		notEnoughTables = false;	//reset for 4seatTable
-		while (totalPersons >= 3 && !notEnoughTables) {
-			for (int i = 0; i < availableTables.size(); i++) {
-				if (availableTables.get(i).charAt(0) == 'F') { // check has eight people table
-					suggestTables += availableTables.remove(i) + " ";
-					totalPersons -= 4;
-					// System.out.println("remaining person: "+totalPersons);
-					break;
-				}else if (i == availableTables.size()-1) {
-					notEnoughTables = true;
-				}
-			}
-		}
-
-		notEnoughTables = false;	//reset for 2seatTable
-		while (totalPersons > 0 && !notEnoughTables) {
-			for (int i = 0; i < availableTables.size(); i++) {
-				if (availableTables.get(i).charAt(0) == 'T') { // check has eight people table
-					suggestTables += availableTables.remove(i) + " ";
-					totalPersons -= 2;
-					// System.out.println("remaining person: "+totalPersons);
-					if(availableTables.size()<=0 && totalPersons>0) {	// no table
+			int totalPersons = r.getTotalPersons();
+			String suggestTables = "";
+			System.out.print("Suggestion for " + totalPersons + " persons: ");
+			while (totalPersons >= 7 && !notEnoughTables) {
+				for (int i = 0; i < availableTables.size(); i++) {
+					String s = availableTables.get(i);
+					if (availableTables.get(i).charAt(0) == 'H') { // check has eight people table
+						suggestTables += availableTables.remove(i) + " ";
+						totalPersons -= 8;
+						// System.out.println("remaining person: "+totalPersons);
+						break;
+					} else if (i == availableTables.size() - 1) {
 						notEnoughTables = true;
 					}
-					break;
 				}
-
 			}
-		}
-		
-		if(!notEnoughTables) {
-		System.out.println(suggestTables);
-		}else {
-			System.out.println("Not enough tables");
-		}
-		}else {
+
+			notEnoughTables = false; // reset for 4seatTable
+			while (totalPersons >= 3 && !notEnoughTables) {
+				for (int i = 0; i < availableTables.size(); i++) {
+					if (availableTables.get(i).charAt(0) == 'F') { // check has eight people table
+						suggestTables += availableTables.remove(i) + " ";
+						totalPersons -= 4;
+						// System.out.println("remaining person: "+totalPersons);
+						break;
+					} else if (i == availableTables.size() - 1) {
+						notEnoughTables = true;
+					}
+				}
+			}
+
+			notEnoughTables = false; // reset for 2seatTable
+			while (totalPersons > 0 && !notEnoughTables) {
+				for (int i = 0; i < availableTables.size(); i++) {
+					if (availableTables.get(i).charAt(0) == 'T') { // check has eight people table
+						suggestTables += availableTables.remove(i) + " ";
+						totalPersons -= 2;
+						// System.out.println("remaining person: "+totalPersons);
+						if (availableTables.size() <= 0 && totalPersons > 0) { // no table
+							notEnoughTables = true;
+						}
+						break;
+					}
+
+				}
+			}
+
+			if (!notEnoughTables) {
+				System.out.println(suggestTables);
+			} else {
+				System.out.println("Not enough tables");
+			}
+		} else {
 			throw new TableAssignedException();
 		}
 	}
